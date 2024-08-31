@@ -1,7 +1,7 @@
 
-# Safety Tracking Training
+# Forest Fire Training
 
-This repository contains the code and configuration files for the Safety Tracking Training project. The project includes training scripts, testing scripts, configurations, and necessary dependencies for deploying and running safety tracking models.
+This repository contains the code and configuration files for the Forest Fire Training project. The project includes training scripts, testing scripts, configurations, and necessary dependencies for deploying and models.
 
 ## Table of Contents
 - [Installation](#installation)
