@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
-from collections import Counter
-import numpy as np
 import pandas as pd
+import numpy as np
+from collections import Counter
 
 def plot_class_distribution(annotations):
     class_counts = Counter(ann['category_id'] for ann in annotations)
@@ -20,5 +20,3 @@ def generate_statistics_report(annotations):
     df[['width', 'height']].plot(kind='hist', bins=30, alpha=0.5)
     plt.title('Bounding Box Size Distribution')
     plt.show()
-
-# More functions as needed...
