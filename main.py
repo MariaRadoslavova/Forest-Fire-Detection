@@ -1,8 +1,8 @@
-from scripts.download_dataset import download_and_prepare_dataset
-from scripts.produce_overlays import produce_overlays
-from scripts.split_coco_json import split_coco_json
-from scripts.organize_images import organize_images
-from scripts.analyze_annotations import (
+from src.download_dataset import download_and_prepare_dataset
+from src.produce_overlays import produce_overlays
+from src.split_coco_json import split_coco_json
+from src.organize_images import organize_images
+from src.analyze_annotations import (
     plot_class_distribution,
     generate_statistics_report
 )
