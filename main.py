@@ -7,6 +7,8 @@ from src.analyze_annotations import (
     generate_statistics_report
 )
 
+import json
+
 def main():
     # Step 1: Download and prepare dataset
     dataset_url = "https://universe.roboflow.com/ds/vmof7PYopz?key=WdcJOXhGC3"
