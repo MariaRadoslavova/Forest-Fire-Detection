@@ -6,8 +6,6 @@ This repository contains the code and configuration files for the Forest Fire Tr
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
-  - [Docker Building](#docker-building)
-  - [Docker Running](#docker-running)
   - [On Start-Up](#on-start-up)
   - [CPU Monitoring](#cpu-monitoring)
   - [GPU Monitoring](#gpu-monitoring)
@@ -21,7 +19,6 @@ This repository contains the code and configuration files for the Forest Fire Tr
   - [Training](#training)
   - [Testing](#testing)
   - [Tid Bits](#tid-bits)
-- [Project Structure](#project-structure)
 
 ## Installation
 
