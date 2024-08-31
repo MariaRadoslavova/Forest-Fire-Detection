@@ -1,0 +1,9 @@
+matplotlib
+numpy
+pycocotools
+six
+terminaltables
+fairscale
+scipy
+pika
+redis
