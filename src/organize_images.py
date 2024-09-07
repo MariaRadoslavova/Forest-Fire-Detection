@@ -30,5 +30,6 @@ def organize_images(train_annotations, test_annotations, image_dir='data/images'
 
 # Example usage
 if __name__ == "__main__":
-    organize_images('train_annotations.json', 'test_annotations.json', 'data/images')
+    organize_images('data/annotations/train_annotations.json', 'data/annotations/test_annotations.json', 'data/images')
+
 
