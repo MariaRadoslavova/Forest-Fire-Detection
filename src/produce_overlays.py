@@ -1,40 +1,26 @@
+import os
 import cv2
 import matplotlib.pyplot as plt
 import json
-import os
 
-def produce_overlays(annotation_file, images_dir, overlays_dir):
-    # Load the annotations
+def produce_overlays(annotation_file, output_dir='data/train', num_images=5):
     with open(annotation_file, 'r') as f:
         annotations = json.load(f)
 
-    # Dictionary to map image IDs to file names
     image_dict = {img['id']: img['file_name'] for img in annotations['images']}
 
-    # Create the overlays directory if it doesn't exist
-    os.makedirs(overlays_dir, exist_ok=True)
-
-    # Process and save overlays for a few images
-    for annotation in annotations['annotations'][:5]:  # Limiting to 5 images for display
+    for annotation in annotations['annotations'][:num_images]:
         image_id = annotation['image_id']
-        bbox = annotation['bbox']  # Bounding box: [x, y, width, height]
+        bbox = annotation['bbox']
 
-        # Load the image
-        img_path = os.path.join(images_dir, image_dict[image_id])
+        img_path = os.path.join(output_dir, image_dict[image_id])
         img = cv2.imread(img_path)
 
-        # Draw the bounding box
         x, y, w, h = map(int, bbox)
-        cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)  # Green bounding box
+        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        # Save the image with the overlay
-        overlay_path = os.path.join(overlays_dir, image_dict[image_id])
-        cv2.imwrite(overlay_path, img)
+        plt.figure(figsize=(8, 8))
+        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        plt.axis('off')
+        plt.show()
 
-    print(f'Overlays produced and saved to {overlays_dir}')
-
-if __name__ == "__main__":
-    annotation_file = 'data/train/_annotations.coco.json'
-    images_dir = 'data/train'
-    overlays_dir = 'data/overlays'
-    produce_overlays(annotation_file, images_dir, overlays_dir)
