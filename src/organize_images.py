@@ -1,35 +1,24 @@
 import os
 import shutil
-import json
 
-def organize_images(train_annotations, test_annotations, image_dir='data/images'):
-    with open(train_annotations, 'r') as f:
-        train_data = json.load(f)
-    
-    with open(test_annotations, 'r') as f:
-        test_data = json.load(f)
+def organize_dataset(raw_dir, target_dir):
+    # Create the 'data/train' folder if it doesn't exist
+    os.makedirs(os.path.join(target_dir, 'train'), exist_ok=True)
 
-    # Create directories for train and test images
-    train_img_dir = os.path.join(image_dir, 'train')
-    test_img_dir = os.path.join(image_dir, 'test')
+    # Move the contents of the dataset's 'train' folder into the 'data/train/' folder
+    for item in os.listdir(os.path.join(raw_dir, 'train')):
+        s = os.path.join(raw_dir, 'train', item)
+        d = os.path.join(target_dir, 'train', item)
+        shutil.move(s, d)
 
-    os.makedirs(train_img_dir, exist_ok=True)
-    os.makedirs(test_img_dir, exist_ok=True)
+    # Clean up the extracted folder
+    shutil.rmtree(raw_dir)
 
-    # Move train images
-    for img in train_data['images']:
-        img_path = os.path.join(image_dir, img['file_name'])
-        if os.path.exists(img_path):
-            shutil.move(img_path, os.path.join(train_img_dir, img['file_name']))
+    print(f'Dataset organized into {target_dir}')
 
-    # Move test images
-    for img in test_data['images']:
-        img_path = os.path.join(image_dir, img['file_name'])
-        if os.path.exists(img_path):
-            shutil.move(img_path, os.path.join(test_img_dir, img['file_name']))
-
-# Example usage
 if __name__ == "__main__":
-    organize_images('train_annotations.json', 'test_annotations.json', 'data/images')
+    raw_dir = 'data/raw'
+    target_dir = 'data/train'
+    organize_dataset(raw_dir, target_dir)
 
 
