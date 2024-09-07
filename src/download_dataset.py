@@ -1,20 +1,43 @@
 import os
-import shutil
+import requests
+import zipfile
 
-def download_and_prepare_dataset(url, output_dir='data/train'):
+def download_and_prepare_dataset(dataset_url, output_dir='data'):
+    dataset_dir = os.path.join(output_dir, 'images')
+    annotations_dir = os.path.join(output_dir, 'annotations')
+
+    # Create directories if they don't exist
+    os.makedirs(dataset_dir, exist_ok=True)
+    os.makedirs(annotations_dir, exist_ok=True)
+
     # Download the dataset
-    os.system(f'curl -L "{url}" > roboflow.zip')
-    os.system('unzip roboflow.zip -d roboflow_data')
-    os.system('rm roboflow.zip')
+    response = requests.get(dataset_url)
+    zip_path = os.path.join(output_dir, 'dataset.zip')
 
-    # Move the dataset into a folder called `data/train/`
-    os.makedirs(output_dir, exist_ok=True)
-    for item in os.listdir('roboflow_data/train'):
-        s = os.path.join('roboflow_data/train', item)
-        d = os.path.join(output_dir, item)
-        shutil.move(s, d)
+    with open(zip_path, 'wb') as f:
+        f.write(response.content)
 
-    # Clean up the extracted folder
-    shutil.rmtree('roboflow_data')
-    print(f'Dataset downloaded and moved to {output_dir}')
+    # Extract the dataset
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(output_dir)
+
+    # Move images to the correct folder
+    extracted_img_dir = os.path.join(output_dir, 'train')
+    for file_name in os.listdir(extracted_img_dir):
+        if file_name.endswith(('.png', '.jpg', '.jpeg')):
+            os.rename(os.path.join(extracted_img_dir, file_name), os.path.join(dataset_dir, file_name))
+
+    # Move annotations file
+    annotation_file = os.path.join(extracted_img_dir, '_annotations.coco.json')
+    if os.path.exists(annotation_file):
+        os.rename(annotation_file, os.path.join(annotations_dir, '_annotations.coco.json'))
+
+    # Clean up extracted folder and zip file
+    os.rmdir(extracted_img_dir)
+    os.remove(zip_path)
+
+# Example usage
+if __name__ == "__main__":
+    dataset_url = "https://universe.roboflow.com/ds/vmof7PYopz?key=WdcJOXhGC3"
+    download_and_prepare_dataset(dataset_url)
 
