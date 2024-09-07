@@ -1,35 +1,37 @@
 import json
-import random
+import os
+import shutil
+from sklearn.model_selection import train_test_split
 
-def split_coco_json(coco_json_path, train_json_path, test_json_path, train_ratio=0.8, seed=42):
-    random.seed(seed)
+def split_coco_json(input_json, output_dir, test_size=0.2):
+    # Load the COCO JSON file
+    with open(input_json, 'r') as f:
+        data = json.load(f)
 
-    with open(coco_json_path, 'r') as f:
-        coco = json.load(f)
+    # Split the annotations
+    annotations = data['annotations']
+    train_annotations, test_annotations = train_test_split(annotations, test_size=test_size)
 
-    images = coco['images']
-    annotations = coco['annotations']
-    categories = coco['categories']
+    # Prepare the train and test data
+    train_data = data.copy()
+    train_data['annotations'] = train_annotations
 
-    random.shuffle(images)
-    num_train = int(len(images) * train_ratio)
-    train_images = images[:num_train]
-    test_images = images[num_train:]
+    test_data = data.copy()
+    test_data['annotations'] = test_annotations
 
-    train_image_ids = set(img['id'] for img in train_images)
-    test_image_ids = set(img['id'] for img in test_images)
-
-    train_annotations = [ann for ann in annotations if ann['image_id'] in train_image_ids]
-    test_annotations = [ann for ann in annotations if ann['image_id'] in test_image_ids]
-
-    train_coco = {'images': train_images, 'annotations': train_annotations, 'categories': categories}
-    test_coco = {'images': test_images, 'annotations': test_annotations, 'categories': categories}
+    # Save the split data
+    train_json_path = os.path.join(output_dir, 'train_annotations.json')
+    test_json_path = os.path.join(output_dir, 'test_annotations.json')
 
     with open(train_json_path, 'w') as f:
-        json.dump(train_coco, f, indent=4)
+        json.dump(train_data, f)
 
     with open(test_json_path, 'w') as f:
-        json.dump(test_coco, f, indent=4)
+        json.dump(test_data, f)
 
-    print(f"Training set: {len(train_images)} images, {len(train_annotations)} annotations")
-    print(f"Testing set: {len(test_images)} images, {len(test_annotations)} annotations")
+if __name__ == '__main__':
+    input_json = 'path/to/your/input_coco.json'
+    output_dir = 'data/annotations'  # Save to the annotations directory
+
+    os.makedirs(output_dir, exist_ok=True)  # Ensure the directory exists
+    split_coco_json(input_json, output_dir)
