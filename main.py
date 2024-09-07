@@ -1,35 +1,36 @@
-import os
-import shutil
-import json
+from scripts.download_dataset import download_and_prepare_dataset
+from scripts.produce_overlays import produce_overlays
+from scripts.split_coco_json import split_coco_json
+from scripts.organize_images import organize_images
+from scripts.analyze_annotations import (
+    plot_class_distribution,
+    generate_statistics_report
+)
 
-def organize_images(train_annotations, test_annotations, image_dir='data/images'):
-    with open(train_annotations, 'r') as f:
+def main():
+    # Step 1: Download and prepare dataset
+    dataset_url = "https://universe.roboflow.com/ds/vmof7PYopz?key=WdcJOXhGC3"
+    download_and_prepare_dataset(dataset_url)
+
+    # Step 2: Produce overlays on images and save to `data/overlays`
+    annotation_file = 'data/annotations/_annotations.coco.json'
+    produce_overlays(annotation_file, num_images=5)
+
+    # Step 3: Split the dataset into training and testing sets
+    split_coco_json(annotation_file, 'data/annotations', 'train_annotations.json', 'test_annotations.json')
+
+    # Step 4: Organize images into train/test folders
+    organize_images('data/annotations/train_annotations.json', 'data/annotations/test_annotations.json', 'data/images')
+
+    # Step 5: Analyze and visualize annotations
+    with open('data/annotations/train_annotations.json', 'r') as f:
         train_data = json.load(f)
-    
-    with open(test_annotations, 'r') as f:
-        test_data = json.load(f)
 
-    # Create directories for train and test images
-    train_img_dir = os.path.join(image_dir, 'train')
-    test_img_dir = os.path.join(image_dir, 'test')
+    plot_class_distribution(train_data['annotations'])
+    generate_statistics_report(train_data['annotations'])
 
-    os.makedirs(train_img_dir, exist_ok=True)
-    os.makedirs(test_img_dir, exist_ok=True)
-
-    # Move train images
-    for img in train_data['images']:
-        img_path = os.path.join(image_dir, img['file_name'])
-        if os.path.exists(img_path):
-            shutil.move(img_path, os.path.join(train_img_dir, img['file_name']))
-
-    # Move test images
-    for img in test_data['images']:
-        img_path = os.path.join(image_dir, img['file_name'])
-        if os.path.exists(img_path):
-            shutil.move(img_path, os.path.join(test_img_dir, img['file_name']))
-
-# Example usage
 if __name__ == "__main__":
-    organize_images('train_annotations.json', 'test_annotations.json', 'data/images')
+    main()
+
 
 
