@@ -31,4 +31,12 @@ def main():
 
 if __name__ == "__main__":
     main()
+import os
+
+# Define the directory paths
+data_dir = 'data'
+annotations_dir = os.path.join(data_dir, 'annotations')
+
+# Create the directories if they don't exist
+os.makedirs(annotations_dir, exist_ok=True)
 
