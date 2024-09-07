@@ -12,15 +12,15 @@ def main():
     dataset_url = "https://universe.roboflow.com/ds/vmof7PYopz?key=WdcJOXhGC3"
     download_and_prepare_dataset(dataset_url)
 
-    # Step 2: Produce overlays on images
-    annotation_file = 'data/train/_annotations.coco.json'
-    produce_overlays(annotation_file)
+    # Step 2: Produce overlays on images and save to `data/overlays`
+    annotation_file = 'data/annotations/_annotations.coco.json'
+    produce_overlays(annotation_file, num_images=5)
 
     # Step 3: Split the dataset into training and testing sets
     split_coco_json(annotation_file, 'train_annotations.json', 'test_annotations.json')
 
     # Step 4: Organize images into train/test folders
-    organize_images('train_annotations.json', 'test_annotations.json', 'data/train')
+    organize_images('train_annotations.json', 'test_annotations.json', 'data/images')
 
     # Step 5: Analyze and visualize annotations
     with open('train_annotations.json', 'r') as f:
