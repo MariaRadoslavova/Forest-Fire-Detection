@@ -2,30 +2,33 @@ import os
 import shutil
 import json
 
-def organize_images(train_json_path, test_json_path, images_dir, output_dir='images'):
-    with open(train_json_path, 'r') as f:
+def organize_images(train_annotations, test_annotations, image_dir='data/images'):
+    with open(train_annotations, 'r') as f:
         train_data = json.load(f)
-
-    with open(test_json_path, 'r') as f:
+    
+    with open(test_annotations, 'r') as f:
         test_data = json.load(f)
 
-    train_output_dir = os.path.join(output_dir, 'train')
-    test_output_dir = os.path.join(output_dir, 'test')
+    # Create directories for train and test images
+    train_img_dir = os.path.join(image_dir, 'train')
+    test_img_dir = os.path.join(image_dir, 'test')
 
-    os.makedirs(train_output_dir, exist_ok=True)
-    os.makedirs(test_output_dir, exist_ok=True)
+    os.makedirs(train_img_dir, exist_ok=True)
+    os.makedirs(test_img_dir, exist_ok=True)
 
-    def move_images(images, target_dir):
-        for img in images:
-            img_filename = img['file_name']
-            src_path = os.path.join(images_dir, img_filename)
-            dest_path = os.path.join(target_dir, img_filename)
-            if os.path.exists(src_path):
-                shutil.move(src_path, dest_path)
-            else:
-                print(f"Warning: {src_path} does not exist.")
+    # Move train images
+    for img in train_data['images']:
+        img_path = os.path.join(image_dir, img['file_name'])
+        if os.path.exists(img_path):
+            shutil.move(img_path, os.path.join(train_img_dir, img['file_name']))
 
-    move_images(train_data['images'], train_output_dir)
-    move_images(test_data['images'], test_output_dir)
+    # Move test images
+    for img in test_data['images']:
+        img_path = os.path.join(image_dir, img['file_name'])
+        if os.path.exists(img_path):
+            shutil.move(img_path, os.path.join(test_img_dir, img['file_name']))
 
-    print(f"Images organized into {train_output_dir} and {test_output_dir}")
+# Example usage
+if __name__ == "__main__":
+    organize_images('train_annotations.json', 'test_annotations.json', 'data/images')
+
