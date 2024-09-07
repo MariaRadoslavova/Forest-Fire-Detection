@@ -22,3 +22,4 @@ produce_overlays(images_dir, overlays_dir)
 organize_images(images_dir)
 split_coco_json(input_json, annotations_dir)
 
+
