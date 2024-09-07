@@ -1,43 +1,28 @@
-import os
 import requests
 import zipfile
+import os
 
-def download_and_prepare_dataset(dataset_url, output_dir='data'):
-    dataset_dir = os.path.join(output_dir, 'images')
-    annotations_dir = os.path.join(output_dir, 'annotations')
-
-    # Create directories if they don't exist
-    os.makedirs(dataset_dir, exist_ok=True)
-    os.makedirs(annotations_dir, exist_ok=True)
-
+def download_dataset(url, save_dir):
     # Download the dataset
-    response = requests.get(dataset_url)
-    zip_path = os.path.join(output_dir, 'dataset.zip')
-
+    response = requests.get(url, stream=True)
+    response.raise_for_status()
+    
+    zip_path = os.path.join(save_dir, 'dataset.zip')
     with open(zip_path, 'wb') as f:
         f.write(response.content)
 
-    # Extract the dataset
+    # Extract the ZIP file
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(output_dir)
+        zip_ref.extractall(save_dir)
 
-    # Move images to the correct folder
-    extracted_img_dir = os.path.join(output_dir, 'train')
-    for file_name in os.listdir(extracted_img_dir):
-        if file_name.endswith(('.png', '.jpg', '.jpeg')):
-            os.rename(os.path.join(extracted_img_dir, file_name), os.path.join(dataset_dir, file_name))
-
-    # Move annotations file
-    annotation_file = os.path.join(extracted_img_dir, '_annotations.coco.json')
-    if os.path.exists(annotation_file):
-        os.rename(annotation_file, os.path.join(annotations_dir, '_annotations.coco.json'))
-
-    # Clean up extracted folder and zip file
-    os.rmdir(extracted_img_dir)
+    # Remove the ZIP file after extraction
     os.remove(zip_path)
 
-# Example usage
+    print(f'Dataset downloaded and extracted to {save_dir}')
+
 if __name__ == "__main__":
-    dataset_url = "https://universe.roboflow.com/ds/vmof7PYopz?key=WdcJOXhGC3"
-    download_and_prepare_dataset(dataset_url)
+    url = "https://universe.roboflow.com/ds/vmof7PYopz?key=WdcJOXhGC3"  # Update this URL if needed
+    save_dir = 'data/raw'
+    os.makedirs(save_dir, exist_ok=True)
+    download_dataset(url, save_dir)
 
