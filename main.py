@@ -12,9 +12,9 @@ def main():
     dataset_url = "https://universe.roboflow.com/ds/vmof7PYopz?key=WdcJOXhGC3"
     download_and_prepare_dataset(dataset_url)
 
-    # Step 2: Produce overlays on images
+    # Step 2: Produce overlays on images and save to `data/overlays`
     annotation_file = 'data/train/_annotations.coco.json'
-    produce_overlays(annotation_file)
+    produce_overlays(annotation_file, num_images=5)
 
     # Step 3: Split the dataset into training and testing sets
     split_coco_json(annotation_file, 'train_annotations.json', 'test_annotations.json')
@@ -31,4 +31,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
