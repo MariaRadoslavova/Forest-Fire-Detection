@@ -33,4 +33,3 @@ def split_coco_json(coco_json_path, train_json_path, test_json_path, train_ratio
 
     print(f"Training set: {len(train_images)} images, {len(train_annotations)} annotations")
     print(f"Testing set: {len(test_images)} images, {len(test_annotations)} annotations")
-
