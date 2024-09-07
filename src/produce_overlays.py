@@ -1,38 +1,40 @@
-import os
 import cv2
+import matplotlib.pyplot as plt
 import json
+import os
 
-def produce_overlays(annotation_file, output_dir='data/images', overlay_dir='data/overlays', num_images=5):
-    # Create the overlays directory if it doesn't exist
-    os.makedirs(overlay_dir, exist_ok=True)
-
+def produce_overlays(annotation_file, images_dir, overlays_dir):
+    # Load the annotations
     with open(annotation_file, 'r') as f:
         annotations = json.load(f)
 
+    # Dictionary to map image IDs to file names
     image_dict = {img['id']: img['file_name'] for img in annotations['images']}
 
-    for idx, annotation in enumerate(annotations['annotations'][:num_images]):
-        image_id = annotation['image_id']
-        bbox = annotation['bbox']
+    # Create the overlays directory if it doesn't exist
+    os.makedirs(overlays_dir, exist_ok=True)
 
-        img_path = os.path.join(output_dir, image_dict[image_id])
+    # Process and save overlays for a few images
+    for annotation in annotations['annotations'][:5]:  # Limiting to 5 images for display
+        image_id = annotation['image_id']
+        bbox = annotation['bbox']  # Bounding box: [x, y, width, height]
+
+        # Load the image
+        img_path = os.path.join(images_dir, image_dict[image_id])
         img = cv2.imread(img_path)
 
         # Draw the bounding box
         x, y, w, h = map(int, bbox)
-        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)  # Green bounding box
 
-        # Save the overlay image
-        overlay_path = os.path.join(overlay_dir, f"overlay_{idx+1}.jpg")
+        # Save the image with the overlay
+        overlay_path = os.path.join(overlays_dir, image_dict[image_id])
         cv2.imwrite(overlay_path, img)
 
-        print(f"Saved overlay image to {overlay_path}")
+    print(f'Overlays produced and saved to {overlays_dir}')
 
-# Example usage
 if __name__ == "__main__":
-    produce_overlays('data/annotations/_annotations.coco.json', num_images=5)
-
-
-# Example usage
-if __name__ == "__main__":
-    produce_overlays('data/train/_annotations.coco.json', num_images=5)
+    annotation_file = 'data/train/_annotations.coco.json'
+    images_dir = 'data/train'
+    overlays_dir = 'data/overlays'
+    produce_overlays(annotation_file, images_dir, overlays_dir)
