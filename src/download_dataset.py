@@ -1,28 +1,20 @@
-import requests
-import zipfile
 import os
+import shutil
 
-def download_dataset(url, save_dir):
+def download_and_prepare_dataset(url, output_dir='data/train'):
     # Download the dataset
-    response = requests.get(url, stream=True)
-    response.raise_for_status()
-    
-    zip_path = os.path.join(save_dir, 'dataset.zip')
-    with open(zip_path, 'wb') as f:
-        f.write(response.content)
+    os.system(f'curl -L "{url}" > roboflow.zip')
+    os.system('unzip roboflow.zip -d roboflow_data')
+    os.system('rm roboflow.zip')
 
-    # Extract the ZIP file
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(save_dir)
+    # Move the dataset into a folder called `data/train/`
+    os.makedirs(output_dir, exist_ok=True)
+    for item in os.listdir('roboflow_data/train'):
+        s = os.path.join('roboflow_data/train', item)
+        d = os.path.join(output_dir, item)
+        shutil.move(s, d)
 
-    # Remove the ZIP file after extraction
-    os.remove(zip_path)
-
-    print(f'Dataset downloaded and extracted to {save_dir}')
-
-if __name__ == "__main__":
-    url = "https://universe.roboflow.com/ds/vmof7PYopz?key=WdcJOXhGC3"  # Update this URL if needed
-    save_dir = 'data/raw'
-    os.makedirs(save_dir, exist_ok=True)
-    download_dataset(url, save_dir)
+    # Clean up the extracted folder
+    shutil.rmtree('roboflow_data')
+    print(f'Dataset downloaded and moved to {output_dir}')
 
