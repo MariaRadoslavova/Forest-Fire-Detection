@@ -2,7 +2,7 @@ import os
 import cv2
 import json
 
-def produce_overlays(annotation_file, output_dir='data/train', overlay_dir='data/overlays', num_images=5):
+def produce_overlays(annotation_file, output_dir='data/images', overlay_dir='data/overlays', num_images=5):
     # Create the overlays directory if it doesn't exist
     os.makedirs(overlay_dir, exist_ok=True)
 
@@ -27,6 +27,11 @@ def produce_overlays(annotation_file, output_dir='data/train', overlay_dir='data
         cv2.imwrite(overlay_path, img)
 
         print(f"Saved overlay image to {overlay_path}")
+
+# Example usage
+if __name__ == "__main__":
+    produce_overlays('data/annotations/_annotations.coco.json', num_images=5)
+
 
 # Example usage
 if __name__ == "__main__":
