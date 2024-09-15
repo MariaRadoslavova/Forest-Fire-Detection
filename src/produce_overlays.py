@@ -2,6 +2,10 @@ import os
 import cv2
 import json
 
+import os
+import cv2
+import json
+
 def produce_overlays(annotation_file, output_dir='data/images', overlay_dir='data/overlays', num_images=5):
     # Create the overlays directory if it doesn't exist
     os.makedirs(overlay_dir, exist_ok=True)
