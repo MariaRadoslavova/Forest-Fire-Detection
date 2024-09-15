@@ -40,4 +40,3 @@ def download_and_prepare_dataset(dataset_url, output_dir='data'):
 if __name__ == "__main__":
     dataset_url = "https://universe.roboflow.com/ds/vmof7PYopz?key=WdcJOXhGC3"
     download_and_prepare_dataset(dataset_url)
-
