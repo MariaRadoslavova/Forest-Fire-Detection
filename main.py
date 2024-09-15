@@ -1,11 +1,9 @@
-from scripts.download_dataset import download_and_prepare_dataset
-from scripts.produce_overlays import produce_overlays
-from scripts.split_coco_json import split_coco_json
-from scripts.organize_images import organize_images
-from scripts.analyze_annotations import (
-    plot_class_distribution,
-    generate_statistics_report
-)
+from download_dataset import download_and_prepare_dataset
+from produce_overlays import produce_overlays
+from split_coco_json import split_coco_json
+from organize_images import organize_images
+from analyze_annotations import plot_class_distribution, generate_statistics_report
+import json
 
 def main():
     # Step 1: Download and prepare dataset
@@ -32,7 +30,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-if __name__ == "__main__":
-    main()
 
