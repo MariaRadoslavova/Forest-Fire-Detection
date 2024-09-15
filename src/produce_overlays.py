@@ -32,3 +32,4 @@ def produce_overlays(annotation_file, output_dir='data/images', overlay_dir='dat
 if __name__ == "__main__":
     produce_overlays('data/annotations/_annotations.coco.json', num_images=5)
 
+
