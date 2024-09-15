@@ -20,4 +20,3 @@ def generate_statistics_report(annotations):
     df[['width', 'height']].plot(kind='hist', bins=30, alpha=0.5)
     plt.title('Bounding Box Size Distribution')
     plt.show()
-
