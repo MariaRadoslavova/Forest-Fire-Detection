@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import shutil
 
 def split_coco_json(annotation_file, output_dir='data/annotations', train_file='train_annotations.json', test_file='test_annotations.json', test_size=0.2):
     with open(annotation_file, 'r') as f:
@@ -41,5 +42,6 @@ def split_coco_json(annotation_file, output_dir='data/annotations', train_file='
 # Example usage
 if __name__ == "__main__":
     split_coco_json('data/annotations/_annotations.coco.json')
+
 
 
