@@ -1,8 +1,9 @@
-from download_dataset import download_and_prepare_dataset
-from produce_overlays import produce_overlays
-from split_coco_json import split_coco_json
-from organize_images import organize_images
-from analyze_annotations import plot_class_distribution, generate_statistics_report
+from src.analyze_annotations import plot_class_distribution, generate_statistics_report
+from src.download_dataset import download_and_prepare_dataset
+from src.produce_overlays import produce_overlays
+from src.split_coco_json import split_coco_json
+from src.organize_images import organize_images
+
 import json
 
 def main():
