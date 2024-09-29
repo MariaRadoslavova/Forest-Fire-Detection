@@ -1,11 +1,11 @@
 import torch
-from torchmetrics import Accuracy  # Make sure to install torchmetrics if not installed
+from torchmetrics import Accuracy  # Import torchmetrics
 
-def train_model(train_dataloader, test_dataloader, model, optimizer, device, epochs=10):
+def train_model(train_dataloader, test_dataloader, model, optimizer, device, num_classes, epochs=10):
     model.to(device)
 
-    # Initialize accuracy metric
-    accuracy_metric = Accuracy().to(device)
+    # Initialize accuracy metric with 'multiclass' task
+    accuracy_metric = Accuracy(task="multiclass", num_classes=num_classes).to(device)
 
     for epoch in range(epochs):
         print(f"Epoch {epoch+1}/{epochs}")
@@ -30,7 +30,7 @@ def train_model(train_dataloader, test_dataloader, model, optimizer, device, epo
             optimizer.zero_grad()
 
             running_loss += loss.item()
-            running_corrects += torch.sum(preds == labels).item()
+            running_corrects += accuracy_metric(preds, labels).item()
             total_train_samples += labels.size(0)
 
             # Print loss for every mini-batch
@@ -38,7 +38,7 @@ def train_model(train_dataloader, test_dataloader, model, optimizer, device, epo
                 print(f"  Batch {batch_idx+1}/{total_batches}, Training Loss: {loss.item():.4f}")
 
         avg_train_loss = running_loss / total_batches
-        avg_train_acc = running_corrects / total_train_samples
+        avg_train_acc = running_corrects / total_batches
         print(f"  Average Training Loss: {avg_train_loss:.4f}, Training Accuracy: {avg_train_acc:.4f}")
 
         # Validation phase
@@ -58,7 +58,7 @@ def train_model(train_dataloader, test_dataloader, model, optimizer, device, epo
                 preds = torch.argmax(outputs.logits, dim=1)
 
                 val_running_loss += val_loss.item()
-                val_running_corrects += torch.sum(preds == labels).item()
+                val_running_corrects += accuracy_metric(preds, labels).item()
                 total_val_samples += labels.size(0)
 
                 # Print validation loss for every mini-batch
@@ -66,5 +66,5 @@ def train_model(train_dataloader, test_dataloader, model, optimizer, device, epo
                     print(f"  Batch {batch_idx+1}/{val_batches}, Validation Loss: {val_loss.item():.4f}")
 
         avg_val_loss = val_running_loss / val_batches
-        avg_val_acc = val_running_corrects / total_val_samples
+        avg_val_acc = val_running_corrects / val_batches
         print(f"  Average Validation Loss: {avg_val_loss:.4f}, Validation Accuracy: {avg_val_acc:.4f}")
