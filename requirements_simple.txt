@@ -4,6 +4,7 @@ datasets>=1.0.0
 torch>=1.9.0
 torchvision>=0.10.0
 timm>=0.4.5
+torchmetrics
 
 # Optional: Specify versions if needed or remove if using latest versions automatically
 # If there's any specific version of a library you need, you can specify it like this:
