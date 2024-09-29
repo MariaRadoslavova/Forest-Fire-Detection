@@ -1,7 +1,7 @@
 import torch
 from torchmetrics import Accuracy  # Make sure to install torchmetrics if not installed
 
-def train_model(train_dataloader, test_dataloader, model, optimizer, device, num_classes, epochs=10):
+def train_model(train_dataloader, test_dataloader, model, optimizer, device, num_classes=2, epochs=10):
     model.to(device)
 
     # Initialize accuracy metric
