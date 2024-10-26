@@ -16,7 +16,7 @@ def main():
     processor = DetrImageProcessor.from_pretrained("facebook/detr-resnet-50")
 
     # Load the trained model weights
-    model_weights_path = 'weights/model_epoch_1.pth'  # Adjust to the epoch/model you want to use
+    model_weights_path = 'weights/model_epoch_10.pth'  # Adjust to the epoch/model you want to use
     model.load_state_dict(torch.load(model_weights_path))
 
     # Create dataset instance
@@ -41,8 +41,21 @@ def main():
             # Post-process the output
             results = processor.post_process_object_detection(outputs, target_sizes=[pixel_values.shape[-2:]])
 
-            # Save or display the results
-            save_results(batch_idx, results)
+            # Convert tensors in the results to serializable format
+            results_serializable = convert_to_serializable(results)
+
+            # Save the results
+            save_results(batch_idx, results_serializable)
+
+def convert_to_serializable(results):
+    """
+    Convert tensors in the results to serializable format (e.g., lists).
+    """
+    for i, result in enumerate(results):
+        for key, value in result.items():
+            if isinstance(value, torch.Tensor):
+                results[i][key] = value.tolist()  # Convert tensor to list
+    return results
 
 def save_results(batch_idx, results):
     """
@@ -50,7 +63,7 @@ def save_results(batch_idx, results):
     """
     output_path = f"results/result_{batch_idx}.json"
     with open(output_path, 'w') as f:
-        json.dump(results, f)
+        json.dump(results, f, indent=4)
     print(f"Results saved to {output_path}")
 
 if __name__ == "__main__":
