@@ -1,6 +1,10 @@
 import torch
+import os
 
-def train_model(train_dataloader, test_dataloader, model, optimizer, device, epochs=10):
+def train_model(train_dataloader, test_dataloader, model, optimizer, device, epochs=10, save_dir='weights'):
+    # Ensure the save directory exists
+    os.makedirs(save_dir, exist_ok=True)
+    
     model.to(device)
 
     for epoch in range(epochs):
@@ -52,3 +56,8 @@ def train_model(train_dataloader, test_dataloader, model, optimizer, device, epo
 
         avg_val_loss = val_running_loss / val_batches
         print(f"  Average Validation Loss: {avg_val_loss:.4f}")
+
+        # Save model weights at the end of each epoch
+        model_save_path = os.path.join(save_dir, f"model_epoch_{epoch+1}.pth")
+        torch.save(model.state_dict(), model_save_path)
+        print(f"  Model weights saved at: {model_save_path}")
