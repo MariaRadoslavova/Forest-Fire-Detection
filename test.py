@@ -3,12 +3,10 @@ import torch
 from torch.utils.data import DataLoader
 from transformers import DetrForObjectDetection, DetrImageProcessor
 from src.coco_dataset import COCODataset, collate_fn
-from sklearn.metrics import precision_recall_fscore_support
 from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-import json
 
 def main():
     # Paths to your dataset and annotations
@@ -41,15 +39,15 @@ def main():
     # Run inference and collect IoU values with a progress bar
     gt_boxes_all, pred_boxes_all, scores_all = run_inference(test_dataloader, model, processor, device)
 
-    # Parallel processing to compute mIoU, TP, FP vs. thresholds with a progress bar
+    # Parallel processing to compute mIoU, precision, and recall vs. thresholds with a progress bar
     thresholds = np.linspace(0, 1, 100)
     with ProcessPoolExecutor() as executor:
         results = list(tqdm(executor.map(compute_metrics, thresholds, [gt_boxes_all]*100, [pred_boxes_all]*100, [scores_all]*100), total=len(thresholds), desc="Computing metrics"))
 
-    mious, tps, fps = zip(*results)
+    mious, precisions, recalls = zip(*results)
 
     # Plot the results
-    plot_results(thresholds, mious, tps, fps, plot_dir)
+    plot_results(thresholds, mious, precisions, recalls, plot_dir)
 
 def run_inference(dataloader, model, processor, device):
     gt_boxes_all = []
@@ -80,6 +78,7 @@ def run_inference(dataloader, model, processor, device):
 def compute_metrics(threshold, gt_boxes_all, pred_boxes_all, scores_all):
     tp_count = 0
     fp_count = 0
+    fn_count = 0
     ious = []
 
     for gt_boxes, pred_boxes, scores in zip(gt_boxes_all, pred_boxes_all, scores_all):
@@ -89,12 +88,17 @@ def compute_metrics(threshold, gt_boxes_all, pred_boxes_all, scores_all):
 
         tp = sum(iou >= 0.5 for iou in iou_values)
         fp = len(filtered_boxes) - tp
+        fn = len(gt_boxes) - tp
 
         tp_count += tp
         fp_count += fp
+        fn_count += fn
 
     mean_iou = sum(ious) / len(ious) if ious else 0
-    return mean_iou, tp_count, fp_count
+    precision = tp_count / (tp_count + fp_count) if (tp_count + fp_count) > 0 else 0
+    recall = tp_count / (tp_count + fn_count) if (tp_count + fn_count) > 0 else 0
+
+    return mean_iou, precision, recall
 
 def compare_predictions(gt_boxes, pred_boxes):
     iou_values = []
@@ -119,32 +123,16 @@ def compute_iou(boxA, boxB):
     iou = interArea / float(boxAArea + boxBArea - interArea)
     return iou
 
-def plot_results(thresholds, mious, tps, fps, plot_dir):
+def plot_results(thresholds, mious, precisions, recalls, plot_dir):
     plt.figure()
     plt.plot(thresholds, mious, label='mIoU')
+    plt.plot(thresholds, precisions, label='Precision')
+    plt.plot(thresholds, recalls, label='Recall')
     plt.xlabel('Threshold')
-    plt.ylabel('mIoU')
-    plt.title('mIoU vs. Threshold')
+    plt.ylabel('Metric Value')
+    plt.title('mIoU, Precision, and Recall vs. Threshold')
     plt.legend()
-    plt.savefig(os.path.join(plot_dir, 'miou_vs_threshold.png'))
-    plt.close()
-
-    plt.figure()
-    plt.plot(thresholds, tps, label='True Positives')
-    plt.xlabel('Threshold')
-    plt.ylabel('Count')
-    plt.title('TP vs. Threshold')
-    plt.legend()
-    plt.savefig(os.path.join(plot_dir, 'tp_vs_threshold.png'))
-    plt.close()
-
-    plt.figure()
-    plt.plot(thresholds, fps, label='False Positives')
-    plt.xlabel('Threshold')
-    plt.ylabel('Count')
-    plt.title('FP vs. Threshold')
-    plt.legend()
-    plt.savefig(os.path.join(plot_dir, 'fp_vs_threshold.png'))
+    plt.savefig(os.path.join(plot_dir, 'metrics_vs_threshold.png'))
     plt.close()
 
 if __name__ == "__main__":
