@@ -16,7 +16,7 @@ def main():
     processor = DetrImageProcessor.from_pretrained("facebook/detr-resnet-50")
 
     # Load the trained model weights
-    model_weights_path = 'weights/model_epoch_10.pth'  # Adjust to the epoch/model you want to use
+    model_weights_path = 'weights/model_epoch_1.pth'  # Adjust to the epoch/model you want to use
     model.load_state_dict(torch.load(model_weights_path))
 
     # Create dataset instance
