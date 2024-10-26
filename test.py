@@ -7,6 +7,7 @@ from sklearn.metrics import precision_recall_fscore_support
 from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 import json
 
 def main():
@@ -37,13 +38,13 @@ def main():
     model.to(device)
     model.eval()
 
-    # Run inference and collect IoU values
+    # Run inference and collect IoU values with a progress bar
     gt_boxes_all, pred_boxes_all, scores_all = run_inference(test_dataloader, model, processor, device)
 
-    # Parallel processing to compute mIoU, TP, FP vs. thresholds
+    # Parallel processing to compute mIoU, TP, FP vs. thresholds with a progress bar
     thresholds = np.linspace(0, 1, 100)
     with ProcessPoolExecutor() as executor:
-        results = list(executor.map(compute_metrics, thresholds, [gt_boxes_all]*100, [pred_boxes_all]*100, [scores_all]*100))
+        results = list(tqdm(executor.map(compute_metrics, thresholds, [gt_boxes_all]*100, [pred_boxes_all]*100, [scores_all]*100), total=len(thresholds), desc="Computing metrics"))
 
     mious, tps, fps = zip(*results)
 
@@ -56,7 +57,7 @@ def run_inference(dataloader, model, processor, device):
     scores_all = []
 
     with torch.no_grad():
-        for batch_idx, (pixel_values, targets) in enumerate(dataloader):
+        for batch_idx, (pixel_values, targets) in enumerate(tqdm(dataloader, desc="Running inference", leave=False)):
             pixel_values = pixel_values.to(device)
 
             # Run the model on the input
