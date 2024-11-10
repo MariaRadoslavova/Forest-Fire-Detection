@@ -146,7 +146,7 @@ def plot_results(thresholds, mious, precisions, recalls, plot_dir):
 
 def convert_coco_to_xyxy(boxes):
     """
-    Converts bounding boxes from COCO format (x, y, w, h) to [x_min, y_min, x_max, y_max]
+    Converts bounding boxes from COCO format (x_min, y_min, width, height) to [x_min, y_min, x_max, y_max]
     """
     boxes_xyxy = torch.zeros_like(boxes)
     boxes_xyxy[:, 0] = boxes[:, 0]  # x_min
