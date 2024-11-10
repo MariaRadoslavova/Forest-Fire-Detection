@@ -55,28 +55,23 @@ def run_inference(dataloader, model, processor, device):
     scores_all = []
 
     with torch.no_grad():
-        for batch_idx, (pixel_values, targets, orig_sizes) in enumerate(tqdm(dataloader, desc="Running inference", leave=False)):
+        for batch_idx, (pixel_values, targets) in enumerate(tqdm(dataloader, desc="Running inference", leave=False)):
             pixel_values = pixel_values.to(device)
 
             # Run the model on the input
             outputs = model(pixel_values=pixel_values)
 
-            # Prepare target_sizes (original image sizes)
-            target_sizes = torch.tensor([(size[1], size[0]) for size in orig_sizes]).to(device)  # (height, width)
-
             # Post-process the output
-            results = processor.post_process_object_detection(outputs, target_sizes=target_sizes)
+            results = processor.post_process_object_detection(outputs, target_sizes=[pixel_values.shape[-2:]])
 
             # Collect ground truth and prediction data
-            for i in range(len(targets)):
-                # Convert ground truth boxes from COCO format to [x_min, y_min, x_max, y_max]
-                gt_boxes = convert_coco_to_xyxy(targets[i]['boxes']).tolist()
-                pred_boxes = results[i]['boxes'].tolist()
-                scores = results[i]['scores'].tolist()
+            gt_boxes = [target['boxes'].tolist() for target in targets]
+            pred_boxes = results[0]['boxes'].tolist()
+            scores = results[0]['scores'].tolist()
 
-                gt_boxes_all.append(gt_boxes)
-                pred_boxes_all.append(pred_boxes)
-                scores_all.append(scores)
+            gt_boxes_all.append(gt_boxes[0])
+            pred_boxes_all.append(pred_boxes)
+            scores_all.append(scores)
 
     return gt_boxes_all, pred_boxes_all, scores_all
 
@@ -122,14 +117,10 @@ def compute_iou(boxA, boxB):
     yB = min(boxA[3], boxB[3])
 
     interArea = max(0, xB - xA) * max(0, yB - yA)
-    boxAArea = max(0, (boxA[2] - boxA[0])) * max(0, (boxA[3] - boxA[1]))
-    boxBArea = max(0, (boxB[2] - boxB[0])) * max(0, (boxB[3] - boxB[1]))
+    boxAArea = (boxA[2] - boxA[0]) * (boxA[3] - boxA[1])
+    boxBArea = (boxB[2] - boxB[0]) * (boxB[3] - boxB[1])
 
-    denominator = boxAArea + boxBArea - interArea
-    if denominator == 0:
-        return 0.0
-
-    iou = interArea / denominator
+    iou = interArea / float(boxAArea + boxBArea - interArea)
     return iou
 
 def plot_results(thresholds, mious, precisions, recalls, plot_dir):
@@ -143,17 +134,6 @@ def plot_results(thresholds, mious, precisions, recalls, plot_dir):
     plt.legend()
     plt.savefig(os.path.join(plot_dir, 'metrics_vs_threshold.png'))
     plt.close()
-
-def convert_coco_to_xyxy(boxes):
-    """
-    Converts bounding boxes from COCO format (x_min, y_min, width, height) to [x_min, y_min, x_max, y_max]
-    """
-    boxes_xyxy = torch.zeros_like(boxes)
-    boxes_xyxy[:, 0] = boxes[:, 0]  # x_min
-    boxes_xyxy[:, 1] = boxes[:, 1]  # y_min
-    boxes_xyxy[:, 2] = boxes[:, 0] + boxes[:, 2]  # x_max = x_min + width
-    boxes_xyxy[:, 3] = boxes[:, 1] + boxes[:, 3]  # y_max = y_min + height
-    return boxes_xyxy
 
 if __name__ == "__main__":
     main()
