@@ -1,7 +1,7 @@
 import torch
 import os
 
-def train_model(train_dataloader, test_dataloader, model, optimizer, device, epochs=20, save_dir='weights'):
+def train_model(train_dataloader, test_dataloader, model, optimizer, device, epochs=10, save_dir='weights'):
     # Ensure the save directory exists
     os.makedirs(save_dir, exist_ok=True)
     
