@@ -94,7 +94,7 @@ The `test.py` script is used to evaluate the trained model on a designated test 
 
 You can view a preview of the paper for this project by clicking the link below:
 
-[![PDF Paper Preview](assets/paper_thumbnail.png)](assets/Forest_Fire_Detection_Paper.pdf)
+[![PDF Paper Preview](assets/paper_thumbnail.png)](assets/Wildfire_Detection.pdf)
 
 This link will open the PDF paper directly in your browser.
 
@@ -102,7 +102,7 @@ This link will open the PDF paper directly in your browser.
 
 You can view a preview of the presentation for this project by clicking the link below:
 
-[![PDF Presentation Preview](assets/presentation_thumbnail.png)](assets/Forest_Fire_Detection_Presentation.pdf)
+[![PDF Presentation Preview](assets/presentation_thumbnail.png)](assets/Maria_Forest_Fire_Presentation.pdf)
 
 This link will open the PDF presentation directly in your browser.
 
