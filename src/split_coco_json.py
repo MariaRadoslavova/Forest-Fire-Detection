@@ -2,7 +2,7 @@ import json
 import os
 import random
 
-def split_coco_json(annotation_file, output_dir='data/annotations', train_file='train_annotations.json', test_file='test_annotations.json', test_size=0.2):
+def split_coco_json(annotation_file, output_dir='data/annotations', train_file='train_annotations.json', test_file='test_annotations.json', test_size=0.1):
     with open(annotation_file, 'r') as f:
         data = json.load(f)
 
