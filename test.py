@@ -132,12 +132,8 @@ def plot_results(thresholds, mious, precisions, recalls, plot_dir):
     plt.ylabel('Metric Value')
     plt.title('mIoU, Precision, and Recall vs. Threshold')
     plt.legend()
-
-    # Save the plot to a file
     plt.savefig(os.path.join(plot_dir, 'metrics_vs_threshold.png'))
-
-    # Show the plot in Colab
-    plt.show()
+    plt.close()
 
 if __name__ == "__main__":
     main()
