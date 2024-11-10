@@ -31,8 +31,8 @@ def main():
     test_dataset = COCODataset(test_annotations, test_img_dir, processor)
 
     # Use this custom collate function with DataLoader
-    train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=True, collate_fn=collate_fn)
-    test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False, collate_fn=collate_fn)
+    train_dataloader = DataLoader(train_dataset, batch_size=10, shuffle=True, collate_fn=collate_fn)
+    test_dataloader = DataLoader(test_dataset, batch_size=10, shuffle=False, collate_fn=collate_fn)
 
     # Define optimizer
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5)
